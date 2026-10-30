@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#111111">
+<title>Bir Mektup — Sana özel</title>
+<style>
+:root{color-scheme:dark;--bg:#0b0b0c;--panel:#141416;--line:#2b2b30;--text:#f4f0e8;--muted:#aaa5a0;--gold:#c9ad78;--danger:#f2a5a5}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;background:radial-gradient(ellipse at top,#25211b 0,#101011 38%,#09090a 100%);color:var(--text);font-family:Georgia,"Times New Roman",serif;display:flex;justify-content:center;padding:28px 16px}
+main{width:100%;max-width:620px;margin:auto}.eyebrow{font:11px/1.5 system-ui,sans-serif;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);text-align:center;margin:0 0 18px}
+h1{font-size:clamp(32px,8vw,48px);font-weight:400;letter-spacing:.01em;text-align:center;margin:0 0 10px} .subtitle{text-align:center;color:var(--muted);font-size:16px;line-height:1.7;margin:0 auto 28px;max-width:410px}
+.card{border:1px solid #39342b;background:rgba(20,20,22,.92);border-radius:18px;padding:clamp(20px,5vw,34px);box-shadow:0 22px 70px #0008}
+label{display:block;font:12px/1.4 system-ui,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#d8c6a6;margin:18px 0 8px}
+input,textarea{width:100%;border:1px solid #39393e;border-radius:10px;background:#0d0d0f;color:var(--text);padding:14px;font:16px/1.55 system-ui,sans-serif;outline:none}
+textarea{min-height:220px;resize:vertical;font:17px/1.7 Georgia,serif}input:focus,textarea:focus{border-color:var(--gold);box-shadow:0 0 0 2px #c9ad7820}
+button{width:100%;border:0;border-radius:10px;padding:14px 16px;margin-top:18px;background:var(--gold);color:#17130d;font:600 14px system-ui,sans-serif;letter-spacing:.04em;cursor:pointer}
+button.secondary{background:transparent;border:1px solid #5b503c;color:var(--text)}button:disabled{opacity:.55;cursor:wait}
+.note{font:12px/1.65 system-ui,sans-serif;color:var(--muted);margin:16px 0 0}.status{font:13px/1.6 system-ui,sans-serif;margin-top:14px;overflow-wrap:anywhere}.status.error{color:var(--danger)}.status.good{color:#b8d8b1}
+.hidden{display:none!important}.letter{white-space:pre-wrap;font-size:20px;line-height:1.95;color:#f0e8db;overflow-wrap:anywhere}.rule{width:48px;height:1px;background:var(--gold);margin:22px auto}.footer{text-align:center;color:#77716a;font:11px/1.7 system-ui,sans-serif;margin:22px auto 0;max-width:430px}.tiny{font:12px/1.5 system-ui,sans-serif;color:var(--muted);text-align:center;margin-top:18px}
+a{color:var(--gold)}
+</style>
+</head>
+<body>
+<main>
+  <p class="eyebrow">YALNIZCA SANA</p>
+  <h1 id="heading">Bir Mektup</h1>
+  <p class="subtitle" id="subtitle">Bazı kelimeler, doğru zamanı bekler.</p>
+  <section class="card" id="createPanel">
+    <p style="text-align:center;margin:0 0 6px;font-size:21px">Mektubunu hazırla</p>
+    <p class="note" style="text-align:center;margin-top:0">Yazdıkların bu sayfada, cihazında şifrelenir. Mektubun açık hâli hiçbir sunucuya gönderilmez.</p>
+    <label for="letterInput">Mektubun</label>
+    <textarea id="letterInput" placeholder="İçinden geçenleri buraya yaz..."></textarea>
+    <label for="passwordInput">Mektup şifresi</label>
+    <input id="passwordInput" type="password" autocomplete="new-password" placeholder="En az 12 karakter önerilir">
+    <label for="confirmInput">Şifreyi tekrar yaz</label>
+    <input id="confirmInput" type="password" autocomplete="new-password" placeholder="Şifreyi doğrula">
+    <button id="createButton">Şifrele ve özel bağlantıyı oluştur</button>
+    <div id="createStatus" class="status" role="status"></div>
+    <div id="linkArea" class="hidden">
+      <label for="shareLink">Şifreli mektup bağlantın</label>
+      <input id="shareLink" readonly>
+      <button id="copyButton">Bağlantıyı kopyala</button>
+      <p class="note">Bu bağlantıyı sevgiline verebilirsin. Şifreyi ayrı bir mesajla, yalnızca istediğin zaman paylaş. Bağlantıyı kaybetme; bu site mektubunun yedeğini tutmaz.</p>
+    </div>
+  </section>
+  <section class="card hidden" id="unlockPanel">
+    <p style="text-align:center;font-size:21px;margin:0 0 8px">Sana ait bir mektup var</p>
+    <p class="note" style="text-align:center;margin-top:0">Mektubu açmak için sana verilen şifreyi gir.</p>
+    <label for="unlockPassword">Şifre</label>
+    <input id="unlockPassword" type="password" autocomplete="current-password" placeholder="Mektup şifresi">
+    <button id="unlockButton">Mektubu aç</button>
+    <div id="unlockStatus" class="status" role="status"></div>
+  </section>
+  <section class="card hidden" id="letterPanel">
+    <p class="eyebrow">SANA YAZILDI</p>
+    <div class="rule"></div>
+    <div id="openedLetter" class="letter"></div>
+    <div class="rule"></div>
+    <p class="tiny">Bu mektup, onu yazan kişinin sana bırakmak istediği bir hatıra.</p>
+  </section>
+  <p class="footer">Özel bir mektup için, özenle. Şifreyi bilen herkes mektubu okuyabilir; şifreni güvende tut.</p>
+</main>
+<script>
+"use strict";
+const $ = id => document.getElementById(id);
+const enc = new TextEncoder(), dec = new TextDecoder();
+const params = new URLSearchParams(location.search);
+const payload = location.hash.startsWith("#v1.") ? location.hash.slice(1).split(".") : null;
+const b64u = bytes => {
+  let s=""; for (const b of bytes) s+=String.fromCharCode(b);
+  return btoa(s).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");
+};
+const unb64u = s => {
+  s=s.replace(/-/g,"+").replace(/_/g,"/");
+  while(s.length%4) s+="=";
+  const raw=atob(s); return Uint8Array.from(raw,c=>c.charCodeAt(0));
+};
+async function derive(password,salt){
+  const material=await crypto.subtle.importKey("raw",enc.encode(password),"PBKDF2",false,["deriveKey"]);
+  return crypto.subtle.deriveKey({name:"PBKDF2",salt,iterations:310000,hash:"SHA-256"},material,{name:"AES-GCM",length:256},false,["encrypt","decrypt"]);
+}
+function status(id,msg,kind=""){const el=$(id);el.textContent=msg;el.className="status "+kind;}
+if(payload && payload.length===4 && payload[0]==="v1"){
+  $("createPanel").classList.add("hidden"); $("unlockPanel").classList.remove("hidden");
+  $("heading").textContent="Sana Ait Bir Mektup"; $("subtitle").textContent="Şifreyi biliyorsan, kelimeler seni bekliyor.";
+}else if(location.hash){
+  $("createPanel").classList.add("hidden"); $("unlockPanel").classList.remove("hidden");
+  status("unlockStatus","Bu bağlantının biçimi tanınmadı. Gönderen kişiden bağlantıyı yeniden istemelisin.","error");
+}
+$("createButton").addEventListener("click",async()=>{
+  const letter=$("letterInput").value, p=$("passwordInput").value, c=$("confirmInput").value;
+  $("linkArea").classList.add("hidden"); status("createStatus","");
+  if(!letter.trim()){status("createStatus","Önce mektubunu yaz.","error");return}
+  if(p.length<12){status("createStatus","Daha güçlü bir şifre seç: en az 12 karakter kullan.","error");return}
+  if(p!==c){status("createStatus","Şifreler aynı değil. Tekrar kontrol et.","error");return}
+  if(!window.crypto || !crypto.subtle){status("createStatus","Bu tarayıcı güvenli şifrelemeyi desteklemiyor. Sayfayı HTTPS üzerinden aç.","error");return}
+  const btn=$("createButton");btn.disabled=true;btn.textContent="Şifreleniyor…";
+  try{
+    const salt=crypto.getRandomValues(new Uint8Array(16)), iv=crypto.getRandomValues(new Uint8Array(12));
+    const key=await derive(p,salt);
+    const cipher=await crypto.subtle.encrypt({name:"AES-GCM",iv},key,enc.encode(letter));
+    const hash="#v1."+b64u(salt)+"."+b64u(iv)+"."+b64u(new Uint8Array(cipher));
+    $("shareLink").value=location.href.split("#")[0]+hash;
+    $("linkArea").classList.remove("hidden");
+    status("createStatus","Mektubun şifrelendi. Şimdi bağlantıyı kopyalayıp güvenli bir yerde sakla.","good");
+  }catch(e){status("createStatus","Şifreleme başarısız oldu. Sayfayı yenileyip tekrar dene.","error")}
+  finally{btn.disabled=false;btn.textContent="Şifrele ve özel bağlantıyı oluştur"}
+});
+$("copyButton").addEventListener("click",async()=>{
+  const input=$("shareLink");
+  try{await navigator.clipboard.writeText(input.value);status("createStatus","Bağlantı kopyalandı. Kendine de kaydet.","good")}
+  catch(e){input.focus();input.select();status("createStatus","Bağlantı seçildi. Kopyalamak için basılı tutup Kopyala'yı seç.","good")}
+});
+$("unlockButton").addEventListener("click",async()=>{
+  status("unlockStatus","");
+  if(!payload || payload.length!==4 || payload[0]!=="v1"){status("unlockStatus","Bağlantı eksik veya bozuk.","error");return}
+  const p=$("unlockPassword").value;
+  if(!p){status("unlockStatus","Şifreni gir.","error");return}
+  const btn=$("unlockButton");btn.disabled=true;btn.textContent="Mektup açılıyor…";
+  try{
+    const salt=unb64u(payload[1]), iv=unb64u(payload[2]), ciphertext=unb64u(payload[3]);
+    const key=await derive(p,salt);
+    const plain=await crypto.subtle.decrypt({name:"AES-GCM",iv},key,ciphertext);
+    $("openedLetter").textContent=dec.decode(plain);
+    $("unlockPanel").classList.add("hidden");$("letterPanel").classList.remove("hidden");
+    $("subtitle").textContent="Bazı kelimeler, doğru zamanda bulunur.";
+  }catch(e){status("unlockStatus","Şifre yanlış olabilir veya bağlantı bozulmuş. Şifreyi kontrol edip tekrar dene.","error")}
+  finally{btn.disabled=false;btn.textContent="Mektubu aç"}
+});
+</script>
+</body>
+</html>
